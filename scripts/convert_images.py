@@ -60,7 +60,7 @@ def get_cam1(msg):
         rospy.logerr("Exception encountered on cam1.")
 
 
-def run_bash_cmd(command:str):
+def run_bash_cmd(command):
     # run something on the command line.
     process = subprocess.Popen(command.split())
     output, error = process.communicate()
@@ -70,8 +70,11 @@ def main():
     global timestamps_file, CAM0_PATH, CAM1_PATH
     rospy.init_node('image_conversion_node')
 
-    cam_options = {"realsense" : ("/camera/color/image_raw", "/NONE"),
-                   "nuance": ("/camera_array/cam0/image_raw", "/camera_array/cam1/image_raw")}
+    cam_options = {
+        "realsense" : ("/camera/color/image_raw", "/NONE"),
+        "nuance": ("/camera_array/cam0/image_raw", "/camera_array/cam1/image_raw"),
+        "basler": ("/left/downsample_raw", "/right/downsample_raw") 
+    }
 
     # get the dataset name and topics from cmd line params.
     if len(sys.argv) > 2:
@@ -91,7 +94,7 @@ def main():
     # create the folder that images will be saved to.
     DIR_PATH = os.path.join(os.path.expanduser('~'), DATASET_NAME)
     CAM0_PATH = os.path.join(DIR_PATH, 'images', 'mav0', 'cam0', 'data')
-    CAM1_PATH = os.path.join(DIR_PATH, 'images', 'mav0', 'cam0', 'data')
+    CAM1_PATH = os.path.join(DIR_PATH, 'images', 'mav0', 'cam1', 'data')
     run_bash_cmd("mkdir -p "+DIR_PATH+"/images/mav0/cam0/data")
     run_bash_cmd("mkdir -p "+DIR_PATH+"/images/mav0/cam1/data")
     rospy.loginfo("Images will be saved to "+DIR_PATH+".\nYou can now run 'rosbag play ROSBAG_NAME.bag' in a new terminal.\nClose this node with Ctrl+C when your rosbag has finished playing.")
